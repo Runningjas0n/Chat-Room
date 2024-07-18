@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #chat-container {
+            display: flex;
+            width: 800px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: fadeInDown 1s ease; /* 添加入场动画 */
+        }
+        #user-list {
+            width: 200px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            animation: slideInLeft 1s ease; /* 添加入场动画 */
+        }
+        #user-list h2 {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        #user-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #user-list li {
+            padding: 5px 0;
+        }
+        #message-container {
+            flex: 1;
+            padding: 20px;
+        }
+        #message-display {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            animation: slideInRight 1s ease; /* 添加入场动画 */
+        }
+        .message-box {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            animation: fadeInUp 1s ease; /* 添加入场动画 */
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #username-input,
+        #color-input,
+        #message-input {
+            width: calc(100% - 30px);
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        #message-button {
+            width: calc(100% + 10px);
+            padding: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #message-button:hover {
+            background-color: #45a049;
+        }
+        #read-diary-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            animation: bounce 1s infinite; /* 添加跳动动画 */
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        #read-diary-button:hover {
+            background-color: #45a049;
+        }
+        #chatgpt-link {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        #chatgpt-link:hover {
+            background-color: #45a049;
+        }
+
+        #register-link {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        #register-link:hover {
+            background-color: #45a049;
+        }
+
+        #login-link {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;            
+        }
+        #login-link:hover {
+            background-color: #45a049;        
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+</head>
+<body>
+ 
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  
+    <meta name="keywords" content="ChatGPT, 聊天室, 免费">
+
+
+    <div id="chat-container">
+
+        <div id="message-container">
+            <!-- ChatGPT链接 -->
+    <a id="chatgpt-link" href="/chat_with_gpt_page">ChatGPT</a>
+    <a href="/register" id="register-link">注册</a>
+    <a href="/login" id="login-link">登录</a>
+            <h1>海内存知己 天涯若比邻</h1>
+            <div id="message-display"></div>
+            <input id="username-input" type="text" placeholder="尊姓大名" />
+            <input id="color-input" type="color" />
+            <input id="image-input" type="file" accept="image/*">
+            <div id="message-input-container">
+                <input id="message-input" type="text" placeholder="编辑消息" />
+                <button id="message-button">发送</button>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        const socket = io.connect('https://dd92-183-211-156-202.ngrok-free.app/');
+        const messageDisplay = document.getElementById('message-display');
+        const usernameInput = document.getElementById('username-input');
+        const colorInput = document.getElementById('color-input');
+        const messageInput = document.getElementById('message-input');
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            socket.emit('request_users');
+        });
+
+        socket.on('message', function(data) {
+            if (data.image) {
+                const imageBox = document.createElement('div');
+                imageBox.classList.add('message-box');
+                const imageElement = document.createElement('img');
+                imageElement.src = data.image;
+                imageBox.appendChild(imageElement);
+                
+                // 生成下载链接并添加到图片框中
+                const downloadLink = document.createElement('a');
+                downloadLink.href = data.downloadLink;
+                downloadLink.textContent = 'Download Image';
+                imageBox.appendChild(downloadLink);
+                
+                messageDisplay.appendChild(imageBox);
+            } else {
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('message-box');
+                messageBox.textContent = `${data.username}: ${data.message}`;
+                messageBox.style.color = data.color || 'black';
+                messageDisplay.appendChild(messageBox);
+            }
+            messageDisplay.scrollTop = messageDisplay.scrollHeight;
+        });
+
+
+        socket.on('update_users', function(users) {
+            const userUl = document.getElementById('user-ul');
+            userUl.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user;
+                userUl.appendChild(li);
+            });
+        });
+
+        document.getElementById('message-button').addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchChatHistory();
+        });
+        
+        function fetchChatHistory() {
+            fetch('/get_chat_history')
+            .then(response => response.json())
+            .then(data => {
+                displayChatHistory(data);
+            })
+            .catch(error => console.error('Error fetching chat history:', error));
+        }
+        
+        function displayChatHistory(chatHistory) {
+            chatHistory.forEach(msg => {
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('message-box');
+                messageBox.textContent = `${msg.username}: ${msg.message}`;
+                messageBox.style.color = msg.color || 'black';
+                messageDisplay.appendChild(messageBox);
+            });
+            messageDisplay.scrollTop = messageDisplay.scrollHeight;
+        }
+        
+        function sendMessage() {
+            const imageInput = document.getElementById('image-input');
+            const message = messageInput.value;
+            const image = imageInput.files[0]; // 获取上传的图片文件
+            messageInput.value = '';
+            imageInput.value = ''; // 清空图片输入框，以便用户选择下一张图片
+            const username = usernameInput.value || 'User';
+            const color = colorInput.value || 'black';
+
+            if (image) {
+                const formData = new FormData();
+                formData.append('image', image);
+                fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const imageUrl = data.imageUrl;
+                    socket.emit('message', {'username': username, 'message': message, 'color': color, 'image': imageUrl});
+                })
+                .catch(error => console.error('Error uploading image:', error));
+            } else {
+                socket.emit('message', {'username': username, 'message': message, 'color': color});
+            }
+        }
+    </script>
+</body>
+</html>

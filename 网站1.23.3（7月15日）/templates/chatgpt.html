@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChatGPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chatgpt-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .message-container {
+            margin-bottom: 20px;
+            overflow: auto;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .message-container p {
+            margin: 5px 0;
+        }
+        .user-message {
+            background-color: #e6f2ff;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        .gpt-message {
+            background-color: #fff3e6;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        .input-container {
+            margin-top: 20px;
+            display: flex;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        #return-button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        #return-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>ChatGPT</h1>
+
+    <div id="chatgpt-container">
+        <div class="message-container" id="message-container">
+            <!-- 这里显示聊天消息 -->
+            <!-- 示例消息：<p class="user-message">你好，ChatGPT！</p> -->
+            <!-- 示例消息：<p class="gpt-message">你好！我是ChatGPT。</p> -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="输入你的消息...">
+            <button id="send-button">发送</button>
+        </div>
+
+    </div>
+    <button id="return-button" onclick="window.location.href='/desired_url'">返回</button>
+
+
+ <script>
+    const messageContainer = document.getElementById('message-container');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const userMessage = userInput.value;
+        if (userMessage.trim() === '') return;
+
+        appendMessage(userMessage, 'user-message');
+        userInput.value = '';
+
+        // 发送用户消息给后端
+        fetch('/chat_with_gpt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                appendMessage(data.message, 'gpt-message');
+            } else {
+                console.error('Unexpected response from server:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    }
+
+    function appendMessage(message, className) {
+        const messageElement = document.createElement('p');
+        messageElement.textContent = message;
+        messageElement.classList.add(className);
+        messageContainer.appendChild(messageElement);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+</script>
+</body>
+</html>
